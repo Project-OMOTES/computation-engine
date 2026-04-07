@@ -13,12 +13,16 @@ echo "Using docker compose file at: $DOCKER_COMPOSE_FILE"
 $DOCKER_COMPOSE -f $DOCKER_COMPOSE_FILE --env-file $ENV_FILE --profile=manual_dev down
 
 # add postgres user with privileges
-$DOCKER_COMPOSE -f $DOCKER_COMPOSE_FILE --env-file $ENV_FILE up --wait orchestrator_postgres_db
-$DOCKER_COMPOSE -f $DOCKER_COMPOSE_FILE exec orchestrator_postgres_db psql \
-  -d omotes_jobs \
-  -v PG_USERNAME="$POSTGRES_ORCHESTRATOR_USER_NAME" \
-  -v PG_PASSWORD="$POSTGRES_ORCHESTRATOR_USER_PASSWORD" \
-  -v PG_DB=omotes_jobs \
+$DOCKER_COMPOSE -f $DOCKER_COMPOSE_FILE --env-file $ENV_FILE up --wait omotes_postgres_db
+$DOCKER_COMPOSE -f $DOCKER_COMPOSE_FILE exec omotes_postgres_db psql \
+  -v PG_DB_JOBS=omotes_jobs \
+  -v JOBS_RW_USER_NAME="$POSTGRES_ORCHESTRATOR_USER_NAME" \
+  -v JOBS_RW_USER_PASSWORD="$POSTGRES_ORCHESTRATOR_USER_PASSWORD" \
+  -v PG_DB_TIMESERIES=omotes_timeseries \
+  -v TIMESERIES_RW_USER_NAME="$POSTGRES_TIMESERIES_RW_USER_NAME" \
+  -v TIMESERIES_RW_USER_PASSWORD="$POSTGRES_TIMESERIES_RW_USER_PASSWORD" \
+  -v TIMESERIES_RO_USER_NAME="$POSTGRES_TIMESERIES_RO_USER_NAME" \
+  -v TIMESERIES_RO_USER_PASSWORD="$POSTGRES_TIMESERIES_RO_USER_PASSWORD" \
   -f /setup/init.sql
 
 # add rabbitmq 'omotes' and 'celery' vhosts and users

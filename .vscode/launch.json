@@ -1,0 +1,17 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run optimizer.py",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/example_sdk_client/optimizer.py",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/example_sdk_client",
+            "justMyCode": true,
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/example_sdk_client"
+            }
+        }
+    ]
+}

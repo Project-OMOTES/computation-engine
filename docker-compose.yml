@@ -60,7 +60,7 @@ services:
       - ./influxdb/influxdb.conf:/etc/influxdb/influxdb.conf:ro
       - influxdb_storage:/var/lib/influxdb
 
-  orchestrator_postgres_db: &orchestrator_postgres_db
+  omotes_postgres_db: &omotes_postgres_db
     image: postgres:15.4
     restart: unless-stopped
     volumes:
@@ -69,7 +69,6 @@ services:
       - omotes
     environment:
       PGDATA: /var/lib/postgresql/data
-      POSTGRES_DB: omotes_jobs
       POSTGRES_USER: ${POSTGRES_ROOT_USER}
       POSTGRES_PASSWORD: ${POSTGRES_ROOT_PASSWORD}
 
@@ -80,18 +79,16 @@ services:
           "CMD",
           "pg_isready",
           "-U",
-          "${POSTGRES_ROOT_USER}",
-          "-d",
-          "omotes_jobs",
+          "${POSTGRES_ROOT_USER}"
         ]
       interval: 5s
       timeout: 5s
       retries: 10
 
   # Skipped in 'docker-compose up', only used to develop database revisions.
-  orchestrator_postgres_db_dev:
-    <<: *orchestrator_postgres_db
-    hostname: orchestrator_postgres_db
+  omotes_postgres_db_dev:
+    <<: *omotes_postgres_db
+    hostname: omotes_postgres_db
     ports:
       - "${POSTGRES_DEV_PORT}:5432"
     profiles:
@@ -123,7 +120,7 @@ services:
       TASK_RABBITMQ_PORT: 5672
       TASK_RABBITMQ_VIRTUALHOST: omotes_celery
 
-      POSTGRESQL_HOST: orchestrator_postgres_db
+      POSTGRESQL_HOST: omotes_postgres_db
       POSTGRESQL_PORT: 5432
       POSTGRESQL_DATABASE: omotes_jobs
       POSTGRESQL_USERNAME: ${POSTGRES_ORCHESTRATOR_USER_NAME}
@@ -143,13 +140,13 @@ services:
     depends_on:
       rabbitmq:
         condition: service_healthy
-      orchestrator_postgres_db:
+      omotes_postgres_db:
         condition: service_healthy
       omotes_influxdb:
         condition: service_healthy
 
   grow_worker_optimizer: &grow_worker
-    image: ghcr.io/project-omotes/omotes-grow-optimizer-worker:2.1.3
+    image: ghcr.io/project-omotes/omotes-grow-optimizer-worker:2.1.7
     restart: unless-stopped
     deploy: &grow_worker_deploy
       replicas: 2

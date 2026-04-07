@@ -17,7 +17,7 @@ services:
       RABBITMQ_HOST: rabbitmq
       RABBITMQ_PORT: 5672
 
-      POSTGRES_HOST: orchestrator_postgres_db
+      POSTGRES_HOST: omotes_postgres_db
       POSTGRES_PORT: 5432
       POSTGRES_ORCHESTRATOR_USER_NAME: omotes_orchestrator
       POSTGRES_ORCHESTRATOR_USER_PASSWORD: somepass3
@@ -32,6 +32,6 @@ services:
       TIMEOUT_JOB_HANDLER_RERUN_SEC: 5
       JOB_RETENTION_SEC: 20
 
-  orchestrator_postgres_db:
+  omotes_postgres_db:
     ports:
       - "${POSTGRES_DEV_PORT}:5432"
