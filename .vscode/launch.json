@@ -12,6 +12,24 @@
             "env": {
                 "PYTHONPATH": "${workspaceFolder}/example_sdk_client"
             }
+        },
+        {
+            "name": "test__simulator__multiple_ates_run",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "args": [
+                "test_workflows_steps.py::TestWorkflows::test__simulator__multiple_ates_run",
+                "-v",
+                "-s"
+            ],
+            "jinja": true,
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/system_tests/src",
+            "envFile": "${workspaceFolder}/.env.test",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/system_tests"
+            }
         }
     ]
 }
