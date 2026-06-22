@@ -22,15 +22,18 @@ $DOCKER_COMPOSE -f $DOCKER_COMPOSE_FILE exec omotes_postgres psql \
   -v JOBS_RW_USER_NAME="$POSTGRES_ORCHESTRATOR_USER_NAME" \
   -v JOBS_RW_USER_PASSWORD="$POSTGRES_ORCHESTRATOR_USER_PASSWORD" \
   -v PG_DB_TIMESERIES=omotes_timeseries \
+  -v PG_DB_PREFECT=prefect_server \
   -v TIMESERIES_RW_USER_NAME="$POSTGRES_TIMESERIES_RW_USER_NAME" \
   -v TIMESERIES_RW_USER_PASSWORD="$POSTGRES_TIMESERIES_RW_USER_PASSWORD" \
   -v TIMESERIES_RO_USER_NAME="$POSTGRES_TIMESERIES_RO_USER_NAME" \
   -v TIMESERIES_RO_USER_PASSWORD="$POSTGRES_TIMESERIES_RO_USER_PASSWORD" \
+  -v PREFECT_USER_NAME="$POSTGRES_PREFECT_USER_NAME" \
+  -v PREFECT_USER_PASSWORD="$POSTGRES_PREFECT_USER_PASSWORD" \
   -f /setup/init.sql
 
-# add rabbitmq 'omotes' and 'celery' vhosts and users
-$DOCKER_COMPOSE -f $DOCKER_COMPOSE_FILE up --wait rabbitmq
-$DOCKER_COMPOSE -f $DOCKER_COMPOSE_FILE exec rabbitmq /bin/sh -c "./setup/rabbitmq-init.sh"
+# # add rabbitmq 'omotes' and 'celery' vhosts and users
+# $DOCKER_COMPOSE -f $DOCKER_COMPOSE_FILE up --wait rabbitmq
+# $DOCKER_COMPOSE -f $DOCKER_COMPOSE_FILE exec rabbitmq /bin/sh -c "./setup/rabbitmq-init.sh"
 
 # add influxdb users with write access for optimizer/simulator and with admin rights
 # for the frontend (root admin user via env vars)
