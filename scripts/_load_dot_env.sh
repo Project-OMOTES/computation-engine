@@ -14,7 +14,7 @@ fi
 SCRIPT_DIR="$(dirname "$0")/../"
 REPO_ROOT_DIR=$(realpath "$SCRIPT_DIR")
 echo "Using repository root directory to find .env.template: ${REPO_ROOT_DIR}"
-ENV_VARS=$(cat ${REPO_ROOT_DIR}/.env.template | sed 's/\=.*//' | grep . -)
+ENV_VARS=$(cat ${REPO_ROOT_DIR}/.env.template | grep -v '^\s*#' | sed 's/\=.*//' | grep . -)
 
 any_missing=false
 while IFS= read -r ENV_VAR; do

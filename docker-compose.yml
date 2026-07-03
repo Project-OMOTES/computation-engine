@@ -7,7 +7,7 @@ networks:
 
 volumes:
   minio_data:
-  pg_data:
+  postgres_data:
   influxdb_data:
 
 services:
@@ -42,7 +42,7 @@ services:
     restart: unless-stopped
     command: ["postgres", "-p", "${POSTGRES_PORT}"]
     volumes:
-      - "pg_data:/var/lib/postgresql/data/"
+      - "postgres_data:/var/lib/postgresql/data/"
     expose:
       - "${POSTGRES_PORT}"
     ports:
@@ -107,6 +107,7 @@ services:
       PREFECT_SERVER_API_HOST: 0.0.0.0
       PREFECT_UI_API_URL: http://localhost:4200/api
       EXTRA_PIP_PACKAGES: prefect-docker
+      PREFECT_SERVER_API_AUTH_STRING: "admin:password"
     depends_on:
       omotes_postgres:
         condition: service_healthy
@@ -136,6 +137,7 @@ services:
       PREFECT_API_URL: http://prefect-server:4200/api
       PREFECT_LOGGING_SERVER_LEVEL: WARNING
       EXTRA_PIP_PACKAGES: prefect-docker
+      PREFECT_API_AUTH_STRING: "admin:password"
     depends_on:
       prefect-server:
         condition: service_healthy
