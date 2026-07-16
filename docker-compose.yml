@@ -144,7 +144,7 @@ services:
         condition: service_healthy
 
   grow_worker_optimizer: &grow_worker
-    image: ghcr.io/project-omotes/omotes-grow-optimizer-worker:2.1.7
+    image: ghcr.io/project-omotes/omotes-grow-optimizer-worker:2.1.10
     restart: unless-stopped
     deploy: &grow_worker_deploy
       replicas: 2
@@ -159,9 +159,9 @@ services:
     environment: &grow_worker_env
       ESDL_OUTPUT_PROFILES_TYPE: POSTGRESQL
       DB_HOSTNAME: omotes_postgres
-      DB_PORT: 6432
-      DB_USERNAME: omotes_timeseries_rw
-      DB_PASSWORD: somepass4
+      DB_PORT: ${POSTGRES_PORT}
+      DB_USERNAME: ${POSTGRES_TIMESERIES_RW_USER_NAME}
+      DB_PASSWORD: ${POSTGRES_TIMESERIES_RW_USER_PASSWORD}
 
       RABBITMQ_HOSTNAME: rabbitmq-nwn
       RABBITMQ_PORT: 5672
@@ -170,7 +170,7 @@ services:
       RABBITMQ_VIRTUALHOST: omotes_celery
 
       GROW_TASK_TYPE: grow_optimizer_default
-      MAX_TASKS_BEFORE_RESTART: 1
+      MAX_TASKS_BEFORE_RESTART: ${MAX_TASKS_BEFORE_RESTART:-0}
       LOG_LEVEL: ${LOG_LEVEL}
     depends_on:
       rabbitmq:
@@ -212,7 +212,7 @@ services:
       - "./gurobi/gurobi.lic:/app/gurobi/gurobi.lic"
 
   omotes_simulator_worker:
-    image: ghcr.io/project-omotes/omotes-simulator-worker:0.0.28
+    image: ghcr.io/project-omotes/omotes-simulator-worker:0.0.30
     restart: unless-stopped
     deploy:
       replicas: 2
@@ -236,6 +236,7 @@ services:
       RABBITMQ_PASSWORD: ${RABBITMQ_CELERY_USER_PASSWORD}
       RABBITMQ_VIRTUALHOST: omotes_celery
 
+      MAX_TASKS_BEFORE_RESTART: ${MAX_TASKS_BEFORE_RESTART:-0}
       LOG_LEVEL: ${LOG_LEVEL}
     depends_on:
       rabbitmq:
