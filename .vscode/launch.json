@@ -14,12 +14,30 @@
             }
         },
         {
-            "name": "test__simulator__multiple_ates_run",
+            "name": "test__grow_optimizer_default__happy_path",
             "type": "debugpy",
             "request": "launch",
             "module": "pytest",
             "args": [
-                "test_workflows_steps.py::TestWorkflows::test__simulator__multiple_ates_run",
+                "test_workflows_steps.py::TestWorkflows::test__grow_optimizer_default__happy_path",
+                "-v",
+                "-s"
+            ],
+            "jinja": true,
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/system_tests/src",
+            "envFile": "${workspaceFolder}/.env.test",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/system_tests"
+            }
+        },
+        {
+            "name": "test__all",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "args": [
+                "test_workflows_steps.py::TestWorkflows",
                 "-v",
                 "-s"
             ],

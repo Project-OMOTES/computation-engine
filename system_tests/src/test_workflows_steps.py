@@ -122,11 +122,14 @@ def retrieve_esdl_file(path_str: str) -> str:
 
     return esdl_file
 
+
 ATTRIBUTE_REGEX_TO_IGNORE = dict(
-    id="[a-z0-9-]+", # uuid
-    database="[a-z0-9-]+", # uuid
-    reference="[a-z0-9-]+", # uuid
-    releaseDate=".*", # any format
+    id="[a-z0-9-]+",  # uuid
+    database="[a-z0-9-]+",  # uuid
+    reference="[a-z0-9-]+",  # uuid
+    tableName="[a-z0-9-]+",  # uuid
+    configuration="[a-z0-9-]+",  # uuid
+    releaseDate=".*",  # any format
 )
 
 NUMBER_REGEX = re.compile(r"^-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?$")
