@@ -1,10 +1,10 @@
 services:
 
-#  orchestrator:
-#    image: omotes-orchestrator-dev
-#    build:
-#      context: ..
-#      dockerfile: orchestrator/dev.Dockerfile
+  orchestrator:
+    image: omotes-orchestrator-dev
+    build:
+      context: ..
+      dockerfile: orchestrator/dev.Dockerfile
 
   grow_worker_optimizer: &grow_worker
     image: omotes-worker-mesido-dev
@@ -27,8 +27,8 @@ services:
   grow_worker_gurobi:
     <<: *grow_worker
 
-#  omotes_simulator_worker:
-#    image: omotes-worker-simulator-dev
-#    build:
-#      context: ..
-#      dockerfile: simulator-worker/dev.Dockerfile
+  omotes_simulator_worker:
+    image: omotes-worker-simulator-dev
+    build:
+      context: ..
+      dockerfile: simulator-worker/dev.Dockerfile
