@@ -72,6 +72,7 @@ services:
       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     networks:
       - omotes
+#      - mapeditor-net
     environment:
       PGDATA: /var/lib/postgresql/data
       POSTGRES_USER: ${POSTGRES_ROOT_USER}
