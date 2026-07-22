@@ -94,7 +94,7 @@ services:
       retries: 10
 
   orchestrator:
-    image: ghcr.io/project-omotes/omotes_orchestrator:1.2.9
+    image: ghcr.io/project-omotes/omotes_orchestrator:1.2.9 # TODO: update to 1.2.10 (with new omotes-sdk-python) when available
     restart: unless-stopped
     networks:
       - omotes
@@ -145,7 +145,7 @@ services:
         condition: service_healthy
 
   grow_worker_optimizer: &grow_worker
-    image: ghcr.io/project-omotes/omotes-grow-optimizer-worker:2.1.15
+    image: ghcr.io/project-omotes/omotes-grow-optimizer-worker:2.1.15 # TODO: update to 2.1.16 (with new mesido) when available
     restart: unless-stopped
     deploy: &grow_worker_deploy
       replicas: 2
@@ -163,6 +163,8 @@ services:
       DB_PORT: ${POSTGRES_PORT}
       DB_USERNAME: ${POSTGRES_TIMESERIES_RW_USER_NAME}
       DB_PASSWORD: ${POSTGRES_TIMESERIES_RW_USER_PASSWORD}
+      # Used when ESDL_OUTPUT_PROFILES_TYPE=POSTGRESQL
+      PG_DB_TIMESERIES: omotes_timeseries
 
       RABBITMQ_HOSTNAME: rabbitmq-nwn
       RABBITMQ_PORT: 5672
