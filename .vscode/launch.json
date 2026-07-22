@@ -30,6 +30,24 @@
             "env": {
                 "PYTHONPATH": "${workspaceFolder}/system_tests"
             }
+        },
+        {
+            "name": "test__all",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "args": [
+                "test_workflows_steps.py::TestWorkflows",
+                "-v",
+                "-s"
+            ],
+            "jinja": true,
+            "justMyCode": true,
+            "cwd": "${workspaceFolder}/system_tests/src",
+            "envFile": "${workspaceFolder}/.env.test",
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/system_tests"
+            }
         }
     ]
 }

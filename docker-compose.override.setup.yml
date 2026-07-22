@@ -18,6 +18,6 @@ services:
       INFLUXDB_FRONTEND_ADMIN_USER_PASSWORD: ${INFLUXDB_FRONTEND_ADMIN_USER_PASSWORD}
       INFLUXDB_PORT: ${INFLUXDB_PORT}
 
-  orchestrator_postgres_db:
+  omotes_postgres:
     volumes:
       - "${POSTGRES_INIT_FILE:-./postgres/postgres-init.sql}:/setup/init.sql:ro"

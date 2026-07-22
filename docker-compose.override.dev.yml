@@ -8,12 +8,12 @@ services:
 
   grow_worker_optimizer: &grow_worker
     image: omotes-worker-mesido-dev
-
-  grow_worker_simulator:
-    <<: *grow_worker
     build:
       context: ..
       dockerfile: optimizer-worker/dev.Dockerfile
+
+  grow_worker_simulator:
+    <<: *grow_worker
 
   grow_worker_optimizer_no_heat_losses:
     <<: *grow_worker
@@ -32,7 +32,3 @@ services:
     build:
       context: ..
       dockerfile: simulator-worker/dev.Dockerfile
-
-  orchestrator_postgres_db:
-    ports:
-      - "${POSTGRES_DEV_PORT}:5432"

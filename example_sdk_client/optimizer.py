@@ -11,17 +11,17 @@ from omotes_sdk.omotes_interface import (
     JobStatusUpdate,
 )
 
-rabbitmq_config = RabbitMQConfig(username="omotes", password="somepass1", virtual_host="omotes")
+rabbitmq_config = RabbitMQConfig(port=5673,username="omotes", password="somepass1", virtual_host="omotes")
 STOP_EVENT = threading.Event()
 
 
 def handle_on_finished(job: Job, result: JobResult):
-    print("--------------Logs:")
-    print(result.logs)
-    print()
-    print("--------------ESDL:")
-    print(result.output_esdl)
-    print()
+    # print("--------------Logs:")
+    # print(result.logs)
+    # print()
+    # print("--------------ESDL:")
+    # print(result.output_esdl)
+    # print()
     print("--------------ESDL messages:")
     print(result.esdl_messages)
     print("--------------Result")

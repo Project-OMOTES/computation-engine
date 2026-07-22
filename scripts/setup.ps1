@@ -13,21 +13,21 @@ get-content .env | foreach {
 # docker compose stop
 
 # Deploy postgres omotes schema
-docker compose --profile=manual_dev down orchestrator_postgres_db_dev
-docker compose up -d --wait orchestrator_postgres_db
-docker compose exec orchestrator_postgres_db psql -d postgres -c 'CREATE DATABASE omotes_jobs;'
-docker compose exec orchestrator_postgres_db psql -d omotes_jobs -c "CREATE USER $env:POSTGRES_ORCHESTRATOR_USER_NAME WITH PASSWORD '$env:POSTGRES_ORCHESTRATOR_USER_PASSWORD';"
-docker compose exec orchestrator_postgres_db psql -d omotes_jobs -c "ALTER USER $env:POSTGRES_ORCHESTRATOR_USER_NAME WITH PASSWORD '$env:POSTGRES_ORCHESTRATOR_USER_PASSWORD';"
-docker compose exec orchestrator_postgres_db psql -d omotes_jobs -c "GRANT ALL PRIVILEGES ON DATABASE omotes_jobs TO $env:POSTGRES_ORCHESTRATOR_USER_NAME;"
-docker compose exec orchestrator_postgres_db psql -d omotes_jobs -c "GRANT ALL PRIVILEGES ON SCHEMA public TO $env:POSTGRES_ORCHESTRATOR_USER_NAME;"
-docker compose exec orchestrator_postgres_db psql -d omotes_jobs -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $env:POSTGRES_ORCHESTRATOR_USER_NAME;"
-docker compose exec orchestrator_postgres_db psql -d omotes_jobs -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO $env:POSTGRES_ORCHESTRATOR_USER_NAME;"
-docker compose exec orchestrator_postgres_db psql -d omotes_jobs -c "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO $env:POSTGRES_ORCHESTRATOR_USER_NAME;"
-docker compose exec orchestrator_postgres_db psql -d omotes_jobs -c "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO $env:POSTGRES_ORCHESTRATOR_USER_NAME;"
+docker compose down
+docker compose up -d --wait postgres_db
+docker compose exec omotes_postgres psql -d postgres -c 'CREATE DATABASE omotes_jobs;'
+docker compose exec omotes_postgres psql -d omotes_jobs -c "CREATE USER $env:POSTGRES_ORCHESTRATOR_USER_NAME WITH PASSWORD '$env:POSTGRES_ORCHESTRATOR_USER_PASSWORD';"
+docker compose exec omotes_postgres psql -d omotes_jobs -c "ALTER USER $env:POSTGRES_ORCHESTRATOR_USER_NAME WITH PASSWORD '$env:POSTGRES_ORCHESTRATOR_USER_PASSWORD';"
+docker compose exec omotes_postgres psql -d omotes_jobs -c "GRANT ALL PRIVILEGES ON DATABASE omotes_jobs TO $env:POSTGRES_ORCHESTRATOR_USER_NAME;"
+docker compose exec omotes_postgres psql -d omotes_jobs -c "GRANT ALL PRIVILEGES ON SCHEMA public TO $env:POSTGRES_ORCHESTRATOR_USER_NAME;"
+docker compose exec omotes_postgres psql -d omotes_jobs -c "GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO $env:POSTGRES_ORCHESTRATOR_USER_NAME;"
+docker compose exec omotes_postgres psql -d omotes_jobs -c "GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO $env:POSTGRES_ORCHESTRATOR_USER_NAME;"
+docker compose exec omotes_postgres psql -d omotes_jobs -c "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON TABLES TO $env:POSTGRES_ORCHESTRATOR_USER_NAME;"
+docker compose exec omotes_postgres psql -d omotes_jobs -c "ALTER DEFAULT PRIVILEGES IN SCHEMA public GRANT ALL ON SEQUENCES TO $env:POSTGRES_ORCHESTRATOR_USER_NAME;"
 
 # Upgrade omotes tables
-docker compose build orchestrator_postgres_db_upgrade
-docker compose run --rm orchestrator_postgres_db_upgrade
+docker compose build omotes_postgres_upgrade
+docker compose run --rm omotes_postgres_upgrade
 
 # Setup rabbitmq
 docker compose up -d --wait rabbitmq
