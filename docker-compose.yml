@@ -2,8 +2,8 @@ networks:
   omotes:
     driver: bridge
     name: omotes
-#  mapeditor-net:
-#    external: true
+  mapeditor-net:
+    external: true
 
 volumes:
   minio_data:
@@ -18,10 +18,15 @@ services:
       - "${INFLUXDB_RPC_PORT}:${INFLUXDB_RPC_PORT}"
     networks:
       - omotes
-#      - mapeditor-net
+      - mapeditor-net
     environment:
+      INFLUXDB_PORT: ${INFLUXDB_PORT}
       INFLUXDB_ADMIN_USER: ${INFLUXDB_ADMIN_USER}
       INFLUXDB_ADMIN_PASSWORD: ${INFLUXDB_ADMIN_PASSWORD}
+      INFLUXDB_WRITE_USER: ${INFLUXDB_WRITE_USER}
+      INFLUXDB_WRITE_USER_PASSWORD: ${INFLUXDB_WRITE_USER_PASSWORD}
+      INFLUXDB_FRONTEND_ADMIN_USER: ${INFLUXDB_FRONTEND_ADMIN_USER}
+      INFLUXDB_FRONTEND_ADMIN_USER_PASSWORD: ${INFLUXDB_FRONTEND_ADMIN_USER_PASSWORD}
       INFLUXDB_HTTP_BIND_ADDRESS: :${INFLUXDB_PORT}
       INFLUXDB_BIND_ADDRESS: :${INFLUXDB_RPC_PORT}
       INFLUXDB_DB: omotes_timeseries
@@ -29,11 +34,12 @@ services:
       LOG_LEVEL: ${LOG_LEVEL}
     healthcheck:
       test:
-        ["CMD", "curl", "-f", "http://omotes_influxdb:${INFLUXDB_PORT}/ping"]
+        ["CMD-SHELL", "curl -f http://localhost:${INFLUXDB_PORT}/ping"]
       interval: 10s
       timeout: 5s
       retries: 10
     volumes:
+      - ./influxdb/influxdb-init.sh:/docker-entrypoint-initdb.d/influxdb-init.sh:ro
       - ./influxdb/influxdb.conf:/etc/influxdb/influxdb.conf:ro
       - influxdb_data:/var/lib/influxdb
 
@@ -42,18 +48,26 @@ services:
     restart: unless-stopped
     command: ["postgres", "-p", "${POSTGRES_PORT}"]
     volumes:
-      - "postgres_data:/var/lib/postgresql/data/"
+      - ./postgres/postgres-init.sql:/setup/init.sql:ro
+      - ./postgres/postgres-init.sh:/docker-entrypoint-initdb.d/01-postgres-init.sh:ro
+      - postgres_data:/var/lib/postgresql/data/
     expose:
       - "${POSTGRES_PORT}"
     ports:
       - "${POSTGRES_PORT}:${POSTGRES_PORT}"
     networks:
       - omotes
-#      - mapeditor-net
+      - mapeditor-net
     environment:
       PGDATA: /var/lib/postgresql/data
       POSTGRES_USER: ${POSTGRES_ROOT_USER}
       POSTGRES_PASSWORD: ${POSTGRES_ROOT_PASSWORD}
+      TIMESERIES_RW_USER_NAME: ${POSTGRES_TIMESERIES_RW_USER_NAME}
+      TIMESERIES_RW_USER_PASSWORD: ${POSTGRES_TIMESERIES_RW_USER_PASSWORD}
+      TIMESERIES_RO_USER_NAME: ${POSTGRES_TIMESERIES_RO_USER_NAME}
+      TIMESERIES_RO_USER_PASSWORD: ${POSTGRES_TIMESERIES_RO_USER_PASSWORD}
+      PREFECT_USER_NAME: ${POSTGRES_PREFECT_USER_NAME}
+      PREFECT_USER_PASSWORD: ${POSTGRES_PREFECT_USER_PASSWORD}
 
       LOG_LEVEL: ${LOG_LEVEL}
     healthcheck:
@@ -87,15 +101,23 @@ services:
     depends_on:
       minio:
         condition: service_healthy
-    volumes:
-      - ./minio/init-buckets.sh:/init-buckets.sh
     networks:
       - omotes
     environment:
       MINIO_ROOT_USER: ${MINIO_ACCESS_KEY}
       MINIO_ROOT_PASSWORD: ${MINIO_SECRET}
-      MINIO_BUCKETS: prefect-cache,prefect-artifacts,prefect-results
-    entrypoint: /bin/sh -c "/init-buckets.sh"
+      MINIO_BUCKETS: prefect-cache,prefect-artifacts
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set myminio http://minio:9000 ${MINIO_ACCESS_KEY} ${MINIO_SECRET};
+      OLD_IFS=$$IFS;
+      IFS=',';
+      for bucket in $$MINIO_BUCKETS; do
+        IFS=$$OLD_IFS;
+        mc mb --ignore-existing myminio/$$bucket;
+      done;
+      exit 0;
+      "
 
   prefect-server:
     image: prefecthq/prefect:3.7.3-python3.11
@@ -107,7 +129,7 @@ services:
       PREFECT_SERVER_API_HOST: 0.0.0.0
       PREFECT_UI_API_URL: http://localhost:4200/api
       EXTRA_PIP_PACKAGES: prefect-docker
-      PREFECT_SERVER_API_AUTH_STRING: "admin:password"
+      PREFECT_SERVER_API_AUTH_STRING: "${PREFECT_USER_NAME}:${PREFECT_PASSWORD}"
     depends_on:
       omotes_postgres:
         condition: service_healthy
@@ -137,153 +159,49 @@ services:
       PREFECT_API_URL: http://prefect-server:4200/api
       PREFECT_LOGGING_SERVER_LEVEL: WARNING
       EXTRA_PIP_PACKAGES: prefect-docker
-      PREFECT_API_AUTH_STRING: "admin:password"
+      PREFECT_API_AUTH_STRING: "${PREFECT_USER_NAME}:${PREFECT_PASSWORD}"
     depends_on:
       prefect-server:
         condition: service_healthy
     restart: unless-stopped
 
-#   orchestrator:
-#     image: ghcr.io/project-omotes/omotes_orchestrator:1.2.6
-#     restart: unless-stopped
-#     networks:
-#       - omotes
-#     volumes:
-#       - "${WORKFLOW_SETTINGS_FILE:?}:/config/workflow_config.json"
-#     environment:
-#       CELERY_RABBITMQ_USERNAME: ${RABBITMQ_CELERY_USER_NAME}
-#       CELERY_RABBITMQ_PASSWORD: ${RABBITMQ_CELERY_USER_PASSWORD}
-#       CELERY_RABBITMQ_HOSTNAME: rabbitmq-nwn
-#       CELERY_RABBITMQ_PORT: 5672
-#       CELERY_RABBITMQ_VIRTUALHOST: omotes_celery
+  orchestrator:
+    image: ghcr.io/project-omotes/omotes_orchestrator:2.0.1
+    ports:
+    - "9200:9200"
+    environment:
+      LOG_LEVEL: INFO
+      PREFECT_API_URL: http://prefect-server:4200/api
+      PREFECT_API_AUTH_STRING: "${PREFECT_USER_NAME}:${PREFECT_PASSWORD}"
+      WORKFLOW_SETTINGS_FILE: /app/config/workflow_config.json
+    volumes:
+      - ${WORKFLOW_SETTINGS_FILE:?}:/app/config/workflow_config.json
+    networks:
+      - omotes
+    restart: unless-stopped
 
-#       SDK_RABBITMQ_USERNAME: ${RABBITMQ_OMOTES_USER_NAME}
-#       SDK_RABBITMQ_PASSWORD: ${RABBITMQ_OMOTES_USER_PASSWORD}
-#       SDK_RABBITMQ_HOSTNAME: rabbitmq-nwn
-#       SDK_RABBITMQ_PORT: 5672
-#       SDK_RABBITMQ_VIRTUALHOST: omotes
-
-#       TASK_RABBITMQ_USERNAME: ${RABBITMQ_CELERY_USER_NAME}
-#       TASK_RABBITMQ_PASSWORD: ${RABBITMQ_CELERY_USER_PASSWORD}
-#       TASK_RABBITMQ_HOSTNAME: rabbitmq-nwn
-#       TASK_RABBITMQ_PORT: 5672
-#       TASK_RABBITMQ_VIRTUALHOST: omotes_celery
-
-#       POSTGRESQL_HOST: omotes_postgres
-#       POSTGRESQL_PORT: ${POSTGRES_PORT}
-#       POSTGRESQL_DATABASE: omotes_jobs
-#       POSTGRESQL_USERNAME: ${POSTGRES_ORCHESTRATOR_USER_NAME}
-#       POSTGRESQL_PASSWORD: ${POSTGRES_ORCHESTRATOR_USER_PASSWORD}
-
-#       TIMEOUT_JOB_MANAGER_START_BUFFER_SEC: ${TIMEOUT_JOB_MANAGER_START_BUFFER_SEC}
-#       TIMEOUT_JOB_HANDLER_RERUN_SEC: ${TIMEOUT_JOB_HANDLER_RERUN_SEC}
-
-#       INFLUXDB_HOST: omotes_influxdb
-#       INFLUXDB_PORT: ${INFLUXDB_PORT}
-#       INFLUXDB_USERNAME: ${INFLUXDB_FRONTEND_ADMIN_USER}
-#       INFLUXDB_PASSWORD: ${INFLUXDB_FRONTEND_ADMIN_USER_PASSWORD}
-
-#       JOB_RETENTION_SEC: ${JOB_RETENTION_SEC}
-
-#       LOG_LEVEL: ${LOG_LEVEL}
-#     depends_on:
-#       omotes_postgres:
-#         condition: service_healthy
-#       omotes_influxdb:
-#         condition: service_healthy
-
-#   grow_worker_optimizer: &grow_worker
-#     image: ghcr.io/project-omotes/omotes-grow-optimizer-worker:2.1.7
-#     restart: unless-stopped
-#     deploy: &grow_worker_deploy
-#       replicas: 2
-#       resources:
-#         limits:
-#           cpus: "4"
-#           memory: 4gb
-#     memswap_limit: 4gb
-#     networks:
-#       - omotes
-# #      - mapeditor-net
-#     environment: &grow_worker_env
-#       INFLUXDB_HOSTNAME: omotes_influxdb
-#       INFLUXDB_PORT: ${INFLUXDB_PORT}
-#       INFLUXDB_USERNAME: ${INFLUXDB_FRONTEND_ADMIN_USER}
-#       INFLUXDB_PASSWORD: ${INFLUXDB_FRONTEND_ADMIN_USER_PASSWORD}
-
-#       RABBITMQ_HOSTNAME: rabbitmq-nwn
-#       RABBITMQ_PORT: 5672
-#       RABBITMQ_USERNAME: ${RABBITMQ_CELERY_USER_NAME}
-#       RABBITMQ_PASSWORD: ${RABBITMQ_CELERY_USER_PASSWORD}
-#       RABBITMQ_VIRTUALHOST: omotes_celery
-
-#       GROW_TASK_TYPE: grow_optimizer_default
-#       LOG_LEVEL: ${LOG_LEVEL}
-#     depends_on:
-#       rabbitmq:
-#         condition: service_healthy
-
-#   grow_worker_simulator:
-#     <<: *grow_worker
-#     environment:
-#       <<: *grow_worker_env
-#       GROW_TASK_TYPE: grow_simulator
-
-#   grow_worker_optimizer_no_heat_losses:
-#     <<: *grow_worker
-#     environment:
-#       <<: *grow_worker_env
-#       GROW_TASK_TYPE: grow_optimizer_no_heat_losses
-
-#   grow_worker_optimizer_with_pressure:
-#     <<: *grow_worker
-#     environment:
-#       <<: *grow_worker_env
-#       GROW_TASK_TYPE: grow_optimizer_with_pressure
-
-#   grow_worker_optimizer_eac:
-#     <<: *grow_worker
-#     environment:
-#       <<: *grow_worker_env
-#       GROW_TASK_TYPE: grow_optimizer_eac
-
-#   grow_worker_gurobi:
-#     <<: *grow_worker
-#     deploy:
-#       <<: *grow_worker_deploy
-#       replicas: 1  # only 1 WLS available with a baseline of 1 active session
-#     environment:
-#       <<: *grow_worker_env
-#       GROW_TASK_TYPE: grow_optimizer_no_heat_losses_gurobi,grow_optimizer_default_gurobi,grow_optimizer_eac_gurobi
-#     volumes:
-#       - "./gurobi/gurobi.lic:/app/gurobi/gurobi.lic"
-
-#   omotes_simulator_worker:
-#     image: ghcr.io/project-omotes/omotes-simulator-worker:0.0.28
-#     restart: unless-stopped
-#     deploy:
-#       replicas: 2
-#       resources:
-#         limits:
-#           cpus: "4"
-#           memory: 4gb
-#     memswap_limit: 4gb
-#     networks:
-#       - omotes
-# #      - mapeditor-net
-#     environment:
-#       INFLUXDB_HOSTNAME: omotes_influxdb
-#       INFLUXDB_PORT: ${INFLUXDB_PORT}
-#       INFLUXDB_USERNAME: ${INFLUXDB_ADMIN_USER}
-#       INFLUXDB_PASSWORD: ${INFLUXDB_ADMIN_PASSWORD}
-
-#       RABBITMQ_HOSTNAME: rabbitmq-nwn
-#       RABBITMQ_PORT: 5672
-#       RABBITMQ_USERNAME: ${RABBITMQ_CELERY_USER_NAME}
-#       RABBITMQ_PASSWORD: ${RABBITMQ_CELERY_USER_PASSWORD}
-#       RABBITMQ_VIRTUALHOST: omotes_celery
-
-#       LOG_LEVEL: ${LOG_LEVEL}
-#     depends_on:
-#       rabbitmq:
-#         condition: service_healthy
+  deploy_optimizer:
+    image: ghcr.io/project-omotes/omotes-optimizer:${OPTIMIZER_WORKER_VERSION}
+    profiles:
+    - deploy-optimizer
+    environment:
+      LOG_LEVEL: INFO
+      PREFECT_API_URL: http://prefect-server:4200/api
+      PREFECT_API_AUTH_STRING: "${PREFECT_USER_NAME}:${PREFECT_PASSWORD}"
+      PREFECT_API_URL_FOR_WORKER: http://prefect-server:4200/api
+      PREFECT_WORK_POOL_NAME: "docker-worker"
+      OPTIMIZER_WORKER_VERSION: ${OPTIMIZER_WORKER_VERSION}
+      ESDL_OUTPUT_PROFILES_TYPE: ${OPTIMIZER_ESDL_OUTPUT_PROFILES_TYPE}
+      PREFECT_FLOW_MAX_CONCURRENT_RUNS: ${OPTIMIZER_FLOW_MAX_CONCURRENT_RUNS}
+      DB_HOSTNAME: omotes_postgres
+      DB_PORT: ${POSTGRES_PORT}
+      DB_USERNAME: ${POSTGRES_TIMESERIES_RW_USER_NAME}
+      DB_PASSWORD: ${POSTGRES_TIMESERIES_RW_USER_PASSWORD}
+      MINIO_HOST: minio:9000
+      MINIO_EXTERNAL_HOST: minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET: ${MINIO_SECRET}
+    networks:
+      - omotes
+    entrypoint: ["/src/.venv/bin/python", "-m", "omotes_optimizer_worker.prefect_deploy_flow"]
+    restart: no

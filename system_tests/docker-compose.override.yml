@@ -3,6 +3,8 @@ services:
     build: system_tests/ # This is referenced from root of repo due to how docker-compose works.
     networks:
       - omotes
+    volumes:
+      - ./system_tests_artifacts:/app/test_esdl/artifacts
     depends_on:
       rabbitmq:
         condition: service_healthy
@@ -18,7 +20,7 @@ services:
       RABBITMQ_PORT: 5672
 
       POSTGRES_HOST: omotes_postgres
-      POSTGRES_PORT: 5432
+      POSTGRESQL_PORT: ${POSTGRES_PORT}
       POSTGRES_ORCHESTRATOR_USER_NAME: omotes_orchestrator
       POSTGRES_ORCHESTRATOR_USER_PASSWORD: somepass3
 
@@ -31,7 +33,3 @@ services:
       TIMEOUT_JOB_MANAGER_START_BUFFER_SEC: 2
       TIMEOUT_JOB_HANDLER_RERUN_SEC: 5
       JOB_RETENTION_SEC: 20
-
-  omotes_postgres:
-    ports:
-      - "${POSTGRES_DEV_PORT}:5432"

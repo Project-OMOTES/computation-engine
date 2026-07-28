@@ -1,127 +1,38 @@
 # Omotes System
 
-Setup the required infrastructure and database migrations.
-The infrastructure consists of the following components:
+## start
 
-- RabbitMQ message broker
-- Optimization workers
+Omotes system makes use of prefect for workflow and flow orchestration.
 
-## Setup infrastructure
-
-Copy `.env.template` to `.env` and fill with the appropriate values.
-
-### Workflow configuration
-
-The available workflows are configured via a json file, for an example
-see: `/config/workflow_config_example.json`  
-A workflow must have a `workflow_type_name` and `workflow_type_description_name`.
-The `workflow_parameters` are optional, for workflows that need additional information next to the
-ESDL.
-Each workflow parameter must have a `parameter_type` and `key_name`, all others are optional.  
-See `config/workflow_config_example.json` for options for
-the `string`, `boolean`, `integer`, `float` and `datetime` parameter formats.
-
-Set the environment variable `WORKFLOW_SETTINGS_FILE` to the file to be used by the orchestrator,
-which will pass the workflows definitions to the sdk.
-
-#### Update workflow configuration
-
-To update the workflow configuration of a running omotes-system:
-
-1. Update the `WORKFLOW_SETTINGS_FILE` in the `.env` file
-2. Run `./scripts/start.sh`
-
-This will restart the orchestrator with the updated workflow configuration, which the orchestrator will pass through to
-the sdk's (omotes-rest).
-
-#### Gurobi license
-
-When using the `grow_worker_gurobi` a gurobi WLS license should be available under `gurobi/gurobi.lic`. This `gurobi/`
-folder is ignored by git. Set the number of replicas of this worker to the amount of allowed concurrent sessions in the
-license.
-
-### Start infrastructure
-
-> **_NOTE:_**  Docker can give an error while getting images which can be solved by running
-`export DOCKER_API_VERSION=1.50` first.
-
-To set up the infrastructure components (for windows run in `Git Bash`):
+Start the omotes system by:
 
 ```
-./scripts/setup.sh
+docker compose up --wait
 ```
 
-This setup script does not work if influxdb contains a lot of data due to a timeout when loading the data on influxdb
-startup. The commands in `influxdb/influxdb-init.sh` can also be done in the running container after start instead.
-
-To start the infrastructure components:
+To deploy the optimizer flow to prefect:
 
 ```
-./scripts/start.sh
+docker compose up deploy_optimizer --wait
 ```
 
-To stop the components:
+### start dev
+
+Start the omotes system with local code for the orchestrator, including local code for the omotes-sdk-python:
 
 ```
-./scripts/stop.sh
+docker compose -f docker-compose.yml -f docker-compose.override.dev.yml up --wait
 ```
 
-#### Run in dev mode
-
-Alternatively the components can be run using local code. This requires all omotes repositories to
-be located in the same parent folder. This setup will also expose the postgres database:
+And to deploy the optimizer flow to prefect using local code for omotes-sdk-python and mesido:
 
 ```
-./scripts/start-dev.sh
+docker compose -f docker-compose.yml -f docker-compose.override.dev.yml up deploy_optimizer --wait
 ```
 
-## Update infrastructure
+## usage
 
-In order to update the infrastructure, you first stop the current system, setup the new system
-and start it. Docker and other tooling will ensure only updated infrastructure components will be
-replaced.
-
-```bash
-./scripts/stop.sh
-./scripts/setup.sh
-./scripts/start.sh
-```
-
-## Quickstart example
-
-Once the infrastructure is up and running, an example job may be run to check if the infrastructure
-is behaving as expected. The example may be found in `example_sdk_client/`. To run it:
-
-```bash
-cd example_sdk_client/
-python3 -m venv ./.venv/
-. ./.venv/bin/activate
-pip install -r requirements.txt
-python3 optimizer.py
-deactivate
-```
-
-We expect similar output to:
-
-```bash
-Will use log level LogLevel.INFO for logger 'omotes_sdk'
-Will use log level LogLevel.INFO for logger 'omotes_sdk_internal'
-Will use log level LogLevel.INFO for logger 'aio_pika'
-Will use log level LogLevel.INFO for logger 'aiormq'
-2024-02-13 17:26:18,959 [asyncio][Thread-1][selector_events.py:54][DEBUG]: Using selector: EpollSelector
-2024-02-13 17:26:18,959 [omotes_sdk][Thread-1][broker_interface.py:196][INFO]: Broker interface connecting to localhost:5672 as omotes at omotes
-2024-02-13 17:26:18,986 [omotes_sdk][Thread-1][broker_interface.py:159][INFO]: Declaring queue and retrieving the next message to jobs.cc17549b-2d11-4076-904e-bd548b456e57.result
-2024-02-13 17:26:18,992 [omotes_sdk][Thread-1][broker_interface.py:141][INFO]: Declaring queue and adding subscription to jobs.cc17549b-2d11-4076-904e-bd548b456e57.progress
-2024-02-13 17:26:18,995 [omotes_sdk][Thread-1][broker_interface.py:141][INFO]: Declaring queue and adding subscription to jobs.cc17549b-2d11-4076-904e-bd548b456e57.status
-Job cc17549b-2d11-4076-904e-bd548b456e57 progress (type: grow_optimizer). Status: 2
-Job cc17549b-2d11-4076-904e-bd548b456e57 progress (type: grow_optimizer). Progress: 0.0, message: Job calculation started
-Job cc17549b-2d11-4076-904e-bd548b456e57 progress (type: grow_optimizer). Progress: 1.0, message: Calculation finished.
-Job cc17549b-2d11-4076-904e-bd548b456e57 is done (type: grow_optimizer). Status: 0, output esdl length: 79235, logs length: 0
-2024-02-13 17:27:19,004 [omotes_sdk][Thread-1][broker_interface.py:218][INFO]: Stopping broker interface
-2024-02-13 17:27:19,004 [aio_pika.queue][Thread-1][queue.py:526][INFO]: <RobustQueueIterator: queue='jobs.cc17549b-2d11-4076-904e-bd548b456e57.progress' ctag='ctag1.9dd60c50e8574429ad35c8058bc3ebea'> closing with timeout 5 seconds
-2024-02-13 17:27:19,004 [aio_pika.queue][Thread-1][queue.py:526][INFO]: <RobustQueueIterator: queue='jobs.cc17549b-2d11-4076-904e-bd548b456e57.status' ctag='ctag1.66d19448a3354b1292fec482738b9e23'> closing with timeout 5 seconds
-2024-02-13 17:27:19,011 [omotes_sdk][Thread-1][broker_interface.py:228][INFO]: Stopped broker interface
-```
+After startup the prefect UI minio and the orchestrator are available.
 
 # Licensing & legal considerations
 
