@@ -4,6 +4,8 @@
 
 Omotes system makes use of prefect for workflow and flow orchestration.
 
+First copy the `.env.template` file to `.env`.
+
 Start the omotes system by:
 
 ```
