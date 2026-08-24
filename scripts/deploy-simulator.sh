@@ -1,0 +1,1 @@
+docker compose up omotes-deploy-simulator

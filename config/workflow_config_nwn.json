@@ -38,7 +38,7 @@
   {
     "workflow_type_name": "simulator",
     "workflow_type_description_name": "Conceptual Design - Simulation",
-    "prefect_flow_name": "omotes-optimizer",
+    "prefect_flow_name": "omotes-simulator-worker",
     "memory_limit": "8Gi",
     "workflow_parameters": {
       "timestep": {

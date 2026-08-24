@@ -1,0 +1,1 @@
+docker compose --profile deploy-optimizer --profile deploy-simulator up --wait

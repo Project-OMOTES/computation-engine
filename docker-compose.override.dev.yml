@@ -1,13 +1,19 @@
 services:
 
-  orchestrator:
+  omotes-orchestrator:
     image: omotes-orchestrator-dev
     build:
       context: ..
       dockerfile: orchestrator/dev.Dockerfile
   
-  deploy_optimizer:
+  omotes-deploy-optimizer:
     image: omotes-optimizer-dev
     build:
       context: ..
       dockerfile: optimizer-worker/dev.Dockerfile
+  
+  omotes-deploy-simulator:
+    image: omotes-simulator-dev
+    build:
+      context: ..
+      dockerfile: simulator-worker/dev.Dockerfile
