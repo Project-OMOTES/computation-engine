@@ -1,5 +1,6 @@
 {
   "flake8.enabled": false,
+  "editor.renderValidationDecorations": "on",
   "[python]": {
     "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.codeActionsOnSave": {
@@ -7,6 +8,8 @@
       "source.organizeImports.ruff": "explicit"
     }
   },
+  "ruff.lint.enable": true,
+  "ruff.nativeServer": "on",
   "python.analysis.typeCheckingMode": "basic",
   "python.testing.unittestArgs": [
     "-v",
@@ -29,9 +32,10 @@
   "ty.diagnosticMode": "workspace",
   "ty.importStrategy": "fromEnvironment",
   "ty.interpreter": "${workspaceFolder}/.venv/bin/python",
-  "ty.path": ["${workspaceFolder}/.venv/bin/ty"],
+  "ty.path": [
+    "${workspaceFolder}/.venv/bin/ty"
+  ],
   "ruff.organizeImports": true,
-  "ruff.lint.enable": true,
   "[just]": {
     "editor.formatOnSave": false,
     "editor.defaultFormatter": null

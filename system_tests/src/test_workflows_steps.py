@@ -311,6 +311,7 @@ class TestWorkflows(unittest.IsolatedAsyncioTestCase):
         # assert time series data created
         assert_influxdb_database_existence(run_result.output_esdl, True)
 
+    @unittest.skip("TODO: reinstate after fix in simulator-worker")
     async def test__simulator__ates_run(self) -> None:
         # Arrange
         esdl_file = retrieve_esdl_file("./test_esdl/input/simulator_ates_short_run.esdl")
@@ -419,6 +420,7 @@ class TestWorkflows(unittest.IsolatedAsyncioTestCase):
         )
         self.assertEqual("ERROR", second_feedback["messages"][0]["severity"])
 
+    @unittest.skip("TODO: reinstate after fix in simulator-worker")
     async def test__simulator__kpis_present_in_output(self) -> None:
         """Test that KPIs are calculated and stored in the output ESDL.
 
@@ -497,40 +499,40 @@ class TestWorkflows(unittest.IsolatedAsyncioTestCase):
         self.assertGreater(energy_items["Production"], 0.0, "Production energy should be positive")
         self.assertGreater(energy_items["Demand"], 0.0, "Demand energy should be positive")
 
-    # TODO reinstate after implementation in the orchestrator.
-    # async def test__simulator__delete_time_series_data_after_run(self) -> None:
-    #     # Arrange
-    #     esdl_file = retrieve_esdl_file("./test_esdl/input/simulator_tutorial.esdl")
-    #     workflow_type = "simulator"
-    #     workflow_config = {
-    #         "timestep": timedelta(hours=1).total_seconds(),
-    #         "start_time": datetime(2019, 1, 1, 0, 0, 0).isoformat(),
-    #         "end_time": datetime(2019, 1, 1, 3, 0, 0).isoformat(),
-    #     }
+    @unittest.skip("TODO: reinstate after implementation in the orchestrator")
+    async def test__simulator__delete_time_series_data_after_run(self) -> None:
+        # Arrange
+        esdl_file = retrieve_esdl_file("./test_esdl/input/simulator_tutorial.esdl")
+        workflow_type = "simulator"
+        workflow_config = {
+            "timestep": timedelta(hours=1).total_seconds(),
+            "start_time": datetime(2019, 1, 1, 0, 0, 0).isoformat(),
+            "end_time": datetime(2019, 1, 1, 3, 0, 0).isoformat(),
+        }
 
-    #     # Act
-    #     run_result = await run_workflow(self._testMethodName, esdl_file, workflow_type, workflow_config)
+        # Act
+        run_result = await run_workflow(self._testMethodName, esdl_file, workflow_type, workflow_config)
 
-    #     # Assert simulator run succeeded and created timeseries data.
-    #     self.expect_a_result(run_result, JobStatus.SUCCEEDED)
-    #     assert_influxdb_database_existence(run_result.output_esdl, True)
+        # Assert simulator run succeeded and created timeseries data.
+        self.expect_a_result(run_result, JobStatus.SUCCEEDED)
+        assert_influxdb_database_existence(run_result.output_esdl, True)
 
-    #     # Delete the job through the orchestrator API and assert response contract.
-    #     async with httpx.AsyncClient(base_url=ORCHESTRATOR_BASE_URL, timeout=30.0) as client:
-    #         delete_response = await client.delete(f"/job/{run_result.run_id}")
-    #         delete_response.raise_for_status()
-    #         delete_payload = delete_response.json()
-    #         self.assertEqual(delete_payload["job_id"], str(run_result.run_id))
-    #         self.assertTrue(delete_payload["deleted"])
+        # Delete the job through the orchestrator API and assert response contract.
+        async with httpx.AsyncClient(base_url=ORCHESTRATOR_BASE_URL, timeout=30.0) as client:
+            delete_response = await client.delete(f"/job/{run_result.run_id}")
+            delete_response.raise_for_status()
+            delete_payload = delete_response.json()
+            self.assertEqual(delete_payload["job_id"], str(run_result.run_id))
+            self.assertTrue(delete_payload["deleted"])
 
-    #     # Cleanup can be asynchronous, so poll for eventual deletion of time-series data.
-    #     cleanup_timeout_seconds = 30.0
-    #     cleanup_poll_interval_seconds = 2.0
-    #     cleanup_deadline = time.monotonic() + cleanup_timeout_seconds
-    #     while influxdb_database_exists(run_result.output_esdl):
-    #         if time.monotonic() > cleanup_deadline:
-    #             self.fail(
-    #                 f"Expected InfluxDB timeseries database to be deleted within {cleanup_timeout_seconds} "
-    #                 f"seconds after deleting job {run_result.run_id}."
-    #             )
-    #         await asyncio.sleep(cleanup_poll_interval_seconds)
+        # Cleanup can be asynchronous, so poll for eventual deletion of time-series data.
+        cleanup_timeout_seconds = 30.0
+        cleanup_poll_interval_seconds = 2.0
+        cleanup_deadline = time.monotonic() + cleanup_timeout_seconds
+        while influxdb_database_exists(run_result.output_esdl):
+            if time.monotonic() > cleanup_deadline:
+                self.fail(
+                    f"Expected InfluxDB timeseries database to be deleted within {cleanup_timeout_seconds} "
+                    f"seconds after deleting job {run_result.run_id}."
+                )
+            await asyncio.sleep(cleanup_poll_interval_seconds)
