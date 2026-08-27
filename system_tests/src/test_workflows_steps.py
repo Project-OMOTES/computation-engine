@@ -50,7 +50,7 @@ ESDL_VALUES_PRECISION = 1e-6
 ARTIFACTS_DIR = Path(os.environ.get("OPTIMIZER_ARTIFACTS_DIR", "/app/test_esdl/artifacts"))
 
 
-def save_optimizer_output(test_name: str, output_esdl: str) -> None:
+def save_output_esdl(test_name: str, output_esdl: str) -> None:
     """Write the optimizer output ESDL to the artifacts directory for CI upload."""
     try:
         ARTIFACTS_DIR.mkdir(parents=True, exist_ok=True)
@@ -269,7 +269,7 @@ class TestWorkflows(unittest.IsolatedAsyncioTestCase):
         # Assert
         self.expect_a_result(run_result, JobStatus.SUCCEEDED)
         if run_result.output_esdl:
-            save_optimizer_output("test__grow_optimizer_default__happy_path", run_result.output_esdl)
+            save_output_esdl("test__grow_optimizer_default__happy_path", run_result.output_esdl)
         expected_esdl = retrieve_esdl_file("./test_esdl/output/test__grow_optimizer_default__happy_path.esdl")
         self.compare_esdl(expected_esdl, run_result.output_esdl)
 
@@ -284,7 +284,7 @@ class TestWorkflows(unittest.IsolatedAsyncioTestCase):
         # Assert
         self.expect_a_result(run_result, JobStatus.SUCCEEDED)
         if run_result.output_esdl:
-            save_optimizer_output("test__grow_optimizer_no_heat_losses__happy_path", run_result.output_esdl)
+            save_output_esdl("test__grow_optimizer_no_heat_losses__happy_path", run_result.output_esdl)
         expected_esdl = retrieve_esdl_file("./test_esdl/output/test__grow_optimizer_no_heat_losses__happy_path.esdl")
         self.compare_esdl(expected_esdl, run_result.output_esdl)
 
@@ -304,7 +304,7 @@ class TestWorkflows(unittest.IsolatedAsyncioTestCase):
         # Assert
         self.expect_a_result(run_result, JobStatus.SUCCEEDED)
         if run_result.output_esdl:
-            save_optimizer_output("test__simulator__happy_path", run_result.output_esdl)
+            save_output_esdl("test__simulator__happy_path", run_result.output_esdl)
         expected_esdl = retrieve_esdl_file("./test_esdl/output/test__simulator__happy_path.esdl")
         self.compare_esdl(expected_esdl, run_result.output_esdl, exclude_paths=EXCLUDE_KPI_PATHS)
 
@@ -328,7 +328,7 @@ class TestWorkflows(unittest.IsolatedAsyncioTestCase):
         # Assert
         self.expect_a_result(run_result, JobStatus.SUCCEEDED)
         if run_result.output_esdl:
-            save_optimizer_output("test__simulator__ates_run", run_result.output_esdl)
+            save_output_esdl("test__simulator__ates_run", run_result.output_esdl)
         expected_esdl = retrieve_esdl_file("./test_esdl/output/test__simulator__ates_run.esdl")
         self.compare_esdl(expected_esdl, run_result.output_esdl, exclude_paths=EXCLUDE_KPI_PATHS)
 
@@ -346,7 +346,7 @@ class TestWorkflows(unittest.IsolatedAsyncioTestCase):
         # Assert
         self.expect_a_result(run_result, JobStatus.SUCCEEDED)
         if run_result.output_esdl:
-            save_optimizer_output("test__grow_optimizer_default__happy_path_1source", run_result.output_esdl)
+            save_output_esdl("test__grow_optimizer_default__happy_path_1source", run_result.output_esdl)
         expected_esdl = retrieve_esdl_file("./test_esdl/output/test__grow_optimizer_default__happy_path_1source.esdl")
         self.compare_esdl(expected_esdl, run_result.output_esdl)
 
@@ -361,7 +361,7 @@ class TestWorkflows(unittest.IsolatedAsyncioTestCase):
         # Assert
         self.expect_a_result(run_result, JobStatus.SUCCEEDED)
         if run_result.output_esdl:
-            save_optimizer_output("test__grow_optimizer_default__happy_path_2ndsource", run_result.output_esdl)
+            save_output_esdl("test__grow_optimizer_default__happy_path_2ndsource", run_result.output_esdl)
         expected_esdl = retrieve_esdl_file("./test_esdl/output/test__grow_optimizer_default__happy_path_2ndsource.esdl")
         self.compare_esdl(expected_esdl, run_result.output_esdl)
 
@@ -378,7 +378,7 @@ class TestWorkflows(unittest.IsolatedAsyncioTestCase):
         # Assert
         self.expect_a_result(run_result, JobStatus.SUCCEEDED)
         if run_result.output_esdl:
-            save_optimizer_output(
+            save_output_esdl(
                 "test__grow_optimizer_default__happy_path_2ndsource_merit_order_swapped",
                 run_result.output_esdl,
             )

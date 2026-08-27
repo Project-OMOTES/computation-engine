@@ -6,7 +6,7 @@ Omotes system makes use of prefect for workflow and flow orchestration.
 
 First copy the `.env.template` file to `.env`.
 
-The most import env vars:
+The most relevant env vars for optimzer/simulator control:
 
 - `WORKFLOW_SETTINGS_FILE`: pointing to the workflow definitions (in the `config` folder)
 - `OPTIMIZER_WORKER_VERSION`: optimizer-worker version to be deployed
@@ -30,12 +30,19 @@ To seperately deploy a version (`OPTIMIZER/SIMULATOR_WORKER_VERSION` in `.env`) 
 ./scripts/deploy-simulator.sh
 ```
 
+An optional first argument overrides `OPTIMIZER_WORKER_VERSION`/`SIMULATOR_WORKER_VERSION` from `.env`:
+
+```
+./scripts/deploy-optimizer.sh 3.0.1
+./scripts/deploy-simulator.sh 0.1.1
+```
+
 Multiple versions can be deployed (See `Deployments` in the Prefect UI): run this scripts multiple times with different values for `OPTIMIZER_WORKER_VERSION`/`SIMULATOR_FLOW_MAX_CONCURRENT_RUNS`. Semantic versions cannot be overwritten.
 
 And to stop the omotes-system:
 
 ```
-docker compose down
+./scripts/stop.sh
 ```
 
 ### Workflow definitions

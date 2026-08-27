@@ -166,7 +166,7 @@ services:
     restart: unless-stopped
 
   omotes-orchestrator:
-    image: ghcr.io/project-omotes/omotes_orchestrator:2.0.2
+    image: ghcr.io/project-omotes/omotes_orchestrator:2.0.3
     environment:
       LOG_LEVEL: INFO
       PREFECT_API_URL: http://omotes-prefect-server:4200/api
@@ -217,8 +217,6 @@ services:
     networks:
       - omotes
     depends_on:
-      omotes-orchestrator:
-        condition: service_healthy
       omotes-prefect-server:
         condition: service_healthy
     entrypoint: ["/src/.venv/bin/python", "-m", "omotes_optimizer_worker.prefect_deploy_flow"]
@@ -250,8 +248,6 @@ services:
     networks:
       - omotes
     depends_on:
-      omotes-orchestrator:
-        condition: service_healthy
       omotes-prefect-server:
         condition: service_healthy
     entrypoint: ["/src/.venv/bin/python", "-m", "simulator_worker.prefect_deploy_flow"]

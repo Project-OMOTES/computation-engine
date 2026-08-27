@@ -1620,7 +1620,7 @@ requires-dist = [
     { name = "omotes-sdk-python", specifier = "==5.0.2" },
     { name = "pip-tools" },
     { name = "psycopg", extras = ["binary", "pool"], specifier = "~=3.2.1" },
-    { name = "pyesdl", specifier = "~=25.5.1" },
+    { name = "pyesdl", specifier = "~=26.7.1" },
     { name = "pytest", specifier = "~=8.1.2" },
     { name = "pytest-asyncio", specifier = "~=0.23.8" },
     { name = "pytest-timeout" },
@@ -2229,14 +2229,14 @@ wheels = [
 
 [[package]]
 name = "pyesdl"
-version = "25.5.1"
+version = "26.7.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "pyecore" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/f5/55/f44c9f5a280c62bddda7ff102a7cca4842c3f3bfed6cc7feb3440bf781d5/pyesdl-25.5.1.tar.gz", hash = "sha256:242d2bf4677aee35bb64d4a6fa474777b890c5c7764413dffa16cb68d32472ca", size = 94090, upload-time = "2025-05-09T11:29:37.11Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/10/66/5c4ace1b331b066e79bf6369d5dd3be91e5e5e64bd04b26130a71edc9953/pyesdl-26.7.1.tar.gz", hash = "sha256:e66de01dec8c1a6b461b8de0dc29cc4bcc7f53b783bdb9e0425a1123db8b6232", size = 114886, upload-time = "2026-07-27T13:00:12.861Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/df/e9/d45dc6e3648cd0549a5a995bed4c8f043ee7cc2fb045b3517d5798547595/pyesdl-25.5.1-py3-none-any.whl", hash = "sha256:89d59c82ca4efae617c305163ae61fb27c148bfa2f0dcd61c74aca9ae6b1dd3b", size = 84517, upload-time = "2025-05-09T11:29:35.339Z" },
+    { url = "https://files.pythonhosted.org/packages/36/93/d76dab2283883098d68d2a189110dad2023a5fc90cab7ec4e77321918312/pyesdl-26.7.1-py3-none-any.whl", hash = "sha256:24e1d263616c9e5969ff5142ce672785bc8206e8f3f649de818a7df7535753ca", size = 108874, upload-time = "2026-07-27T13:00:11.334Z" },
 ]
 
 [[package]]
