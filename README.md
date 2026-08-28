@@ -25,6 +25,9 @@ The most relevant env vars for optimzer/simulator control:
 - `SIMULATOR_FLOW_MAX_CONCURRENT_RUNS`: maximum of concurrent simulator runs
 - `OPTIMIZER_PREFECT_FLOW_TIMEOUT_SECONDS`: maximum duration of an optimizer run
 - `SIMULATOR_PREFECT_FLOW_TIMEOUT_SECONDS`: maximum duration of a simulator run
+- `MINIO_EXTERNAL_URL`: the minio api external url used for the presigned url used in the prefect UI. For instance
+  `https://minio-api.test.nwn-design-toolkit.nl/` which points to the minio `9000` port (`9001` is for the UI). It must
+  include `http(s)`.
 
 Each workflow in the `WORKFLOW_SETTINGS_FILE` contains `workflow_type_name`,`workflow_type_description_name` and
 `prefect_flow_name`. Optional are `workflow_parameters` and `memory_limit` which is for example: `512Mi`, `2Gi`, `750M`

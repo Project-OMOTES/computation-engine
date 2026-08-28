@@ -34,7 +34,7 @@ services:
         ["CMD-SHELL", "curl -f http://localhost:${INFLUXDB_PORT}/ping"]
       interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 30
     volumes:
       - ./influxdb/influxdb-init.sh:/docker-entrypoint-initdb.d/influxdb-init.sh:ro
       - ./influxdb/influxdb.conf:/etc/influxdb/influxdb.conf:ro
@@ -71,7 +71,7 @@ services:
         [ "CMD", "pg_isready", "-U", "${POSTGRES_ROOT_USER}", "-p", "${POSTGRES_PORT}"]
       interval: 5s
       timeout: 5s
-      retries: 10
+      retries: 30
 
   omotes-minio:
     image: minio/minio:RELEASE.2025-06-13T11-33-47Z
@@ -90,7 +90,7 @@ services:
       test: [ "CMD", "curl", "-f", "http://localhost:9000/minio/health/ready" ]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 30
 
   omotes-minio-create-buckets:
     image: minio/mc:RELEASE.2025-05-21T01-59-54Z.hotfix.e98f1ead
@@ -141,7 +141,7 @@ services:
       ]
       interval: 10s
       timeout: 5s
-      retries: 10
+      retries: 30
 
   omotes-prefect-worker:
     image: prefecthq/prefect:3.7.3-python3.11
@@ -183,7 +183,7 @@ services:
         ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:9200/health', timeout=5).read()"]
       interval: 5s
       timeout: 5s
-      retries: 20
+      retries: 30
     restart: unless-stopped
 
   omotes-deploy-optimizer:
