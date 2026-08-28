@@ -6,8 +6,8 @@ Omotes system makes use of prefect for workflow and flow orchestration.
 
 ### Config
 
-First create a `.env` file from `.env.template`, by either copying `.env.template` (for dev) or generate with random
-passwords:
+First create a `.env` file from [.env.template](.env.template), by either copying [.env.template](.env.template) (for
+dev) or generate with random passwords:
 
 ```
 cp .env.template .env
@@ -18,7 +18,7 @@ Optionally the template and target paths can be given as arguments: `./scripts/g
 
 The most relevant env vars for optimzer/simulator control:
 
-- `WORKFLOW_SETTINGS_FILE`: pointing to the workflow definitions (in the `config` folder)
+- `WORKFLOW_SETTINGS_FILE`: pointing to the workflow definitions (in the [config](config) folder)
 - `OPTIMIZER_WORKER_VERSION`: optimizer-worker version to be deployed
 - `SIMULATOR_WORKER_VERSION`: simulator-worker version to be deployed
 - `OPTIMIZER_FLOW_MAX_CONCURRENT_RUNS`: maximum of concurrent optimizer runs
@@ -29,8 +29,8 @@ The most relevant env vars for optimzer/simulator control:
 Each workflow in the `WORKFLOW_SETTINGS_FILE` contains `workflow_type_name`,`workflow_type_description_name` and
 `prefect_flow_name`. Optional are `workflow_parameters` and `memory_limit` which is for example: `512Mi`, `2Gi`, `750M`
 or `1000000`.\
-`workflow_parameters` is a dict in jsonforms format, see `/config/workflow_config_example.json` and
-https://jsonforms.io/.
+`workflow_parameters` is a dict in jsonforms format, see
+[config/workflow_config_example.json](config/workflow_config_example.json) and https://jsonforms.io/.
 
 ### Start
 
@@ -69,8 +69,9 @@ After startup the prefect UI ([http://localhost:4200/](http://localhost:4200/)),
 ([http://localhost:9200/docs](http://localhost:9200/docs)) are available.\
 Start a run by
 [http://localhost:9200/docs#/job/create_job_job\_\_post](http://localhost:9200/docs#/job/create_job_job__post) with
-`example_runs\optimizer_post.json` or `example_runs\simulator_post.json`. In these posts the version is not specified:
-the newest (largest) semantic version will be used.\
+[example_runs/optimizer_post.json](example_runs/optimizer_post.json) or
+[example_runs/simulator_post.json](example_runs/simulator_post.json). In these posts the version is not specified: the
+newest (largest) semantic version will be used.\
 The progress can be tracked in the Prefect UI, and result artifacts retrieved after a successful run.
 
 ### Update workflow definitions
@@ -79,6 +80,31 @@ On system start the workflow definitions in the file specified by `WORKFLOW_SETT
 orchestrator.\
 When the system is running the workflow definitions can be updated by a `POST` to the orchestrator api:
 [http://localhost:9200/docs#/workflow/upload_workflows_workflow\_\_post](http://localhost:9200/docs#/workflow/upload_workflows_workflow__post).
+
+### Backup
+
+Docker volumes can be backed up with [backup/docker_volumes_backup.sh](backup/docker_volumes_backup.sh), which archives
+each configured volume to a `.tar.gz` file (overwriting the previous archive of the same type). Check the
+`VOLUMES_TO_BACKUP` list in the script against `docker volume ls` and update it if volume names differ before relying on
+it; volumes not found are skipped with a warning, not a failure.
+
+Schedule backup by opening crontab `crontab -e` and add:
+
+```
+# Runs every single night at 2:00 AM (Overwrites daily archive)
+0 2 * * * /root/omotes-system/backup/docker_volumes_backup.sh daily >> /root/omotes-system/backup/docker_volumes_backup-daily.log 2>&1
+
+# Runs only on Saturdays at 3:00 AM (Overwrites weekly archive)
+0 3 * * 6 /root/omotes-system/backup/docker_volumes_backup.sh weekly >> /root/omotes-system/backup/docker_volumes_backup-weekly.log 2>&1
+```
+
+To restore a volume from a backup archive, use [backup/docker_volume_restore.sh](backup/docker_volume_restore.sh):
+
+```
+backup/docker_volume_restore.sh <path/to/backup_file.tar.gz> <target_volume_name>
+```
+
+If the target volume already exists, its current contents are overwritten after confirmation.
 
 ## Development
 
