@@ -169,8 +169,8 @@ services:
       PREFECT_API_AUTH_STRING: "${PREFECT_USER_NAME}:${PREFECT_PASSWORD}"
       MINIO_HOST: omotes-minio
       MINIO_PORT: 9000
-      MINIO_ACCESS_KEY: omotesadmin
-      MINIO_SECRET: password
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY}
+      MINIO_SECRET: ${MINIO_SECRET}
       WORKFLOW_SETTINGS_FILE: /app/config/workflow_config.json
     volumes:
       - ${WORKFLOW_SETTINGS_FILE:?}:/app/config/workflow_config.json
