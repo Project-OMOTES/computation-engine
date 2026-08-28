@@ -1,1 +1,0 @@
-docker compose -f docker-compose.yml -f docker-compose.override.dev.yml --profile deploy-optimizer --profile deploy-simulator up --build --wait

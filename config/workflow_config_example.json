@@ -1,11 +1,15 @@
 [
   {
     "workflow_type_name": "workflow_1",
-    "workflow_type_description_name": "Example workflow without parameters (except the ESDL)."
+    "workflow_type_description_name": "Example workflow without parameters (except the ESDL).",
+    "prefect_flow_name": "prefect-flow-name",
+    "memory_limit": "8Gi"
   },
   {
     "workflow_type_name": "workflow_2",
     "workflow_type_description_name": "Example workflow with parameters.",
+    "prefect_flow_name": "prefect-flow-name",
+    "memory_limit": "8Gi",
     "workflow_parameters": {
       "string_simple": {
         "type": "string",

@@ -1,0 +1,17 @@
+networks:
+  external-net:
+    name: ${EXTERNAL_NETWORK:?network name required, pass -n <NETWORK_NAME>}
+    external: true
+
+services:
+  omotes-influxdb:
+    networks:
+      - external-net
+
+  omotes-postgres:
+    networks:
+      - external-net
+
+  omotes-orchestrator:
+    networks:
+      - external-net

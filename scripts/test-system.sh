@@ -1,8 +1,13 @@
 #!/bin/bash
 
+DOCKER_COMPOSE_FILES="-f docker-compose.yml"
+if [[ "$1" == "--dev" ]]; then
+  DOCKER_COMPOSE_FILES="$DOCKER_COMPOSE_FILES -f docker-compose.override.dev.yml -f system_tests/docker-compose.override.dev.yml"
+fi
+
 export COMPOSE_PROJECT_NAME=omotes-system-tests
 ENV_FILE=".env.test"
-DOCKER_COMPOSE="docker compose -f docker-compose.yml -f system_tests/docker-compose.override.yml --env-file ${ENV_FILE} --profile deploy-optimizer --profile deploy-simulator"
+DOCKER_COMPOSE="docker compose $DOCKER_COMPOSE_FILES -f system_tests/docker-compose.override.yml --env-file ${ENV_FILE} --profile deploy-optimizer --profile deploy-simulator"
 
 $DOCKER_COMPOSE down -v
 

@@ -38,17 +38,11 @@ services:
       # INFLUXDB_ADMIN_USER: root
       # INFLUXDB_ADMIN_PASSWORD: 9012
 
-  # No host ports needed: everything talks over the internal 'omotes' network,
-  # and this avoids conflicts with an already-running local stack.
   omotes-influxdb:
-    networks: !override
-      - omotes
     ports: !override
       - "8196:${INFLUXDB_PORT:-8096}" # exposed (non-default port) so tests can be run/debugged from the host
 
   omotes-postgres:
-    networks: !override
-      - omotes
     ports: !reset []
 
   omotes-minio:
