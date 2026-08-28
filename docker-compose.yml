@@ -9,7 +9,7 @@ volumes:
   influxdb_data:
 
 services:
-  omotes-influxdb:
+  omotes_influxdb:
     image: influxdb:1.7
     ports:
       - "${INFLUXDB_PORT}:${INFLUXDB_PORT}"
@@ -40,7 +40,7 @@ services:
       - ./influxdb/influxdb.conf:/etc/influxdb/influxdb.conf:ro
       - influxdb_data:/var/lib/influxdb
 
-  omotes-postgres:
+  omotes_postgres:
     image: postgres:15.4
     restart: unless-stopped
     command: ["postgres", "-p", "${POSTGRES_PORT}"]
@@ -121,13 +121,13 @@ services:
     networks:
       - omotes
     environment:
-      PREFECT_API_DATABASE_CONNECTION_URL: postgresql+asyncpg://${POSTGRES_PREFECT_USER_NAME}:${POSTGRES_PREFECT_USER_PASSWORD}@omotes-postgres:${POSTGRES_PORT}/prefect_server
+      PREFECT_API_DATABASE_CONNECTION_URL: postgresql+asyncpg://${POSTGRES_PREFECT_USER_NAME}:${POSTGRES_PREFECT_USER_PASSWORD}@omotes_postgres:${POSTGRES_PORT}/prefect_server
       PREFECT_SERVER_API_HOST: 0.0.0.0
-      PREFECT_UI_API_URL: http://localhost:4200/api
+      PREFECT_UI_API_URL: "/api"
       EXTRA_PIP_PACKAGES: prefect-docker
       PREFECT_SERVER_API_AUTH_STRING: "${PREFECT_USER_NAME}:${PREFECT_PASSWORD}"
     depends_on:
-      omotes-postgres:
+      omotes_postgres:
         condition: service_healthy
       omotes-minio:
         condition: service_healthy
@@ -200,7 +200,7 @@ services:
       ESDL_OUTPUT_PROFILES_TYPE: ${OPTIMIZER_ESDL_OUTPUT_PROFILES_TYPE}
       PREFECT_FLOW_MAX_CONCURRENT_RUNS: ${OPTIMIZER_FLOW_MAX_CONCURRENT_RUNS}
       PREFECT_FLOW_TIMEOUT_SECONDS: ${OPTIMIZER_PREFECT_FLOW_TIMEOUT_SECONDS}
-      DB_HOSTNAME: omotes-postgres
+      DB_HOSTNAME: omotes_postgres
       DB_PORT: ${POSTGRES_PORT}
       DB_USERNAME: ${POSTGRES_TIMESERIES_RW_USER_NAME}
       DB_PASSWORD: ${POSTGRES_TIMESERIES_RW_USER_PASSWORD}
@@ -231,7 +231,7 @@ services:
       SIMULATOR_WORKER_VERSION: ${SIMULATOR_WORKER_VERSION}
       PREFECT_FLOW_MAX_CONCURRENT_RUNS: ${SIMULATOR_FLOW_MAX_CONCURRENT_RUNS}
       PREFECT_FLOW_TIMEOUT_SECONDS: ${SIMULATOR_PREFECT_FLOW_TIMEOUT_SECONDS}
-      INFLUXDB_HOSTNAME: omotes-influxdb
+      INFLUXDB_HOSTNAME: omotes_influxdb
       INFLUXDB_PORT: ${INFLUXDB_PORT}
       INFLUXDB_USERNAME: ${INFLUXDB_ADMIN_USER}
       INFLUXDB_PASSWORD: ${INFLUXDB_ADMIN_PASSWORD}

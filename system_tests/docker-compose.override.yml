@@ -12,37 +12,22 @@ services:
         condition: service_healthy
       omotes-deploy-optimizer:
         condition: service_completed_successfully
-      # omotes-influxdb:
-      #   condition: service_healthy
+      omotes_postgres:
+        condition: service_healthy
+      omotes_influxdb:
+        condition: service_healthy
     environment:
       ORCHESTRATOR_HOST: omotes-orchestrator
       ORCHESTRATOR_PORT: 9200
-      INFLUXDB_HOST: omotes-influxdb
+      INFLUXDB_HOST: omotes_influxdb
       INFLUXDB_PORT: 8096
       OPTIMIZER_FLOW_MAX_CONCURRENT_RUNS: ${OPTIMIZER_FLOW_MAX_CONCURRENT_RUNS}
 
-      # Env vars below are used only by the simulator tests, which still need to be
-      # ported to the Prefect-based orchestrator/optimizer-worker flow.
-      # RABBITMQ_USERNAME: omotes
-      # RABBITMQ_PASSWORD: somepass1
-      # RABBITMQ_VIRTUALHOST: omotes
-      # RABBITMQ_HOST: rabbitmq
-      # RABBITMQ_PORT: 5672
-
-      # POSTGRES_HOST: omotes-postgres
-      # POSTGRESQL_PORT: ${POSTGRES_PORT}
-      # POSTGRES_ORCHESTRATOR_USER_NAME: omotes_orchestrator
-      # POSTGRES_ORCHESTRATOR_USER_PASSWORD: somepass3
-
-      # INFLUXDB_HOST: omotes-influxdb
-      # INFLUXDB_ADMIN_USER: root
-      # INFLUXDB_ADMIN_PASSWORD: 9012
-
-  omotes-influxdb:
+  omotes_influxdb:
     ports: !override
       - "8196:${INFLUXDB_PORT:-8096}" # exposed (non-default port) so tests can be run/debugged from the host
 
-  omotes-postgres:
+  omotes_postgres:
     ports: !reset []
 
   omotes-minio:

@@ -12,7 +12,7 @@
       <quantityAndUnit xsi:type="esdl:QuantityAndUnitType" physicalQuantity="SPEED" unit="METRE" perTimeUnit="SECOND" id="3f4b1caf-5733-475d-b484-7409d702e2bb"/>
     </quantityAndUnits>
     <dataconfigurations xsi:type="esdl:DataConfigurations" id="7792ab53-eb56-43fa-8764-d0bb98a091c9">
-      <configurations xsi:type="esdl:DatabaseConfiguration" id="b80ee7a0-ee35-4f9b-bb92-a89e40c2c138" database="ac1031fb-8f64-4367-8836-b38f9a52cb3d" type="POSTGRESQL" host="omotes-postgres" port="6432"/>
+      <configurations xsi:type="esdl:DatabaseConfiguration" id="b80ee7a0-ee35-4f9b-bb92-a89e40c2c138" database="ac1031fb-8f64-4367-8836-b38f9a52cb3d" type="POSTGRESQL" host="omotes_postgres" port="6432"/>
     </dataconfigurations>
   </energySystemInformation>
   <instance xsi:type="esdl:Instance" id="9af52a01-24e2-4bbe-a7b8-f868161e6ca3" name="Untitled instance">

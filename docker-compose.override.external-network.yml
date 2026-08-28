@@ -4,11 +4,19 @@ networks:
     external: true
 
 services:
-  omotes-influxdb:
+  omotes_influxdb:
     networks:
       - external-net
 
-  omotes-postgres:
+  omotes_postgres:
+    networks:
+      - external-net
+
+  omotes-minio:
+    networks:
+      - external-net
+
+  omotes-prefect-server:
     networks:
       - external-net
 
