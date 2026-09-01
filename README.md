@@ -59,6 +59,8 @@ prefect. `-v <VERSION>` overrides `OPTIMIZER_WORKER_VERSION`/`SIMULATOR_WORKER_V
 Multiple versions can be deployed (See `Deployments` in the Prefect UI): run this scripts multiple times with different
 values for `OPTIMIZER_WORKER_VERSION`/`SIMULATOR_FLOW_MAX_CONCURRENT_RUNS`. Semantic versions cannot be overwritten.
 
+> **NOTE:** For the NWN MapEditor, deployment of new versions happens via GitHub CI of the optimizer/simulator workers.
+
 And to stop the omotes-system:
 
 ```
