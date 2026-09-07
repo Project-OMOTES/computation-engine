@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<esdl:EnergySystem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:esdl="http://www.tno.nl/esdl" name="course_model with return network_simulator" id="fe4a6c5c-eb8c-4976-8da8-05199bf6aa20" description="basic" esdlVersion="v2111" version="11">
+<esdl:EnergySystem xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:esdl="http://www.tno.nl/esdl" name="course_model with return network_test__simulator__ates_run" id="fe4a6c5c-eb8c-4976-8da8-05199bf6aa20" description="basic" esdlVersion="v2111" version="11">
   <energySystemInformation xsi:type="esdl:EnergySystemInformation" id="9a76b800-6e2c-4e99-a9a5-859f7badd061">
     <carriers xsi:type="esdl:Carriers" id="e84423d9-b617-4fa0-b113-1ba12daacaaf">
       <carrier xsi:type="esdl:HeatCommodity" returnTemperature="40.0" id="e96c4852-b2bc-43be-8fa7-5ae5e25a1883_ret" name="supply_ret" supplyTemperature="80.0"/>
